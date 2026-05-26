@@ -1,5 +1,7 @@
 package com.m3.files;
 
+import com.m3.Pair;
+
 import java.io.File;
 import java.nio.file.Path;
 
@@ -34,16 +36,22 @@ public class Folders {
         isEmpty = false;
     }
 
+    private Folders(File modsFolder, File m3Folder) {
+        setModsFolder(modsFolder);
+        setM3Folder(m3Folder);
+        isEmpty = false;
+    }
+
     public Folders(File modsFolder, boolean write) {
         setModsFolder(modsFolder);
-        if (write) homeFiles.writeM3Folder(DIR_M3);
+        if (write) homeFiles.writeM3Folder(DIR_M3, DIR_MODS);
         isEmpty = false;
     }
 
     public static Folders getInstance() {
-        String path = homeFiles.existingM3Folder();
+        Pair<String> path = homeFiles.existingM3Folder();
         if (path == null) return new Folders();
-        else return new Folders(new File(path));
+        else return new Folders(new File(path.getFirst()), new File(path.getSecond()));
     }
 
     public File getModsFolder() {

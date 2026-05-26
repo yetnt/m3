@@ -1,5 +1,6 @@
 package com.m3.files;
 
+import com.m3.Pair;
 import com.m3.util.Files;
 
 import java.io.File;
@@ -26,15 +27,16 @@ public class HomeDirFies {
             BACKUP_FOLDER.mkdirs();
     }
 
-    public String existingM3Folder() {
+    public Pair<String> existingM3Folder() {
         ArrayList<String> lines = Files.readLines(CACHE_TXT);
         if (lines.isEmpty()) return null;
-        else return lines.getFirst();
+        else return new Pair<>(lines.getFirst(), lines.getLast());
     }
 
-    public void writeM3Folder(File m3) {
+    public void writeM3Folder(File m3, File mods) {
         Files.writeLines(CACHE_TXT,
                 (p) -> {
+                    p.println(mods.getAbsolutePath());
                     p.println(m3.getAbsolutePath());
                 },
                 false);
