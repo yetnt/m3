@@ -330,7 +330,7 @@ public class Main extends javax.swing.JFrame {
         if (chosenFolder == null)
             JOptionPane.showMessageDialog(this, "Please select your M3 folder.", "Errpr", JOptionPane.ERROR_MESSAGE);
         else {
-            folders = new Folders(chosenFolder, true);
+            folders.setM3Folder(chosenFolder);
             setText();
         }
     }//GEN-LAST:event_m3FolderBtnActionPerformed

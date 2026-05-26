@@ -30,11 +30,11 @@ public class Folders {
     private Folders() {
         isEmpty = true;
     }
-
-    private Folders(File modsFolder) {
-        setModsFolder(modsFolder);
-        isEmpty = false;
-    }
+//
+//    private Folders(File modsFolder) {
+//        setModsFolder(modsFolder);
+//        isEmpty = false;
+//    }
 
     private Folders(File modsFolder, File m3Folder) {
         setModsFolder(modsFolder);
@@ -73,6 +73,10 @@ public class Folders {
 
     public void setM3Folder(File m3Folder) {
         DIR_M3 = m3Folder;
+        m3Files = new M3Files(DIR_M3);
+        homeFiles.writeM3Folder(m3Folder, DIR_MODS);
+        if (!DIR_M3.exists())
+            DIR_M3.mkdirs();
     }
 
     public boolean isEmpty() {
