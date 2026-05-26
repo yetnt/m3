@@ -4,17 +4,31 @@
  */
 package com.m3;
 
+import com.m3.files.Folders;
+import com.m3.util.Files;
+
+import javax.swing.*;
+import java.io.File;
+
 /**
  *
  * @author ACER
  */
 public class Main extends javax.swing.JFrame {
 
+    public Folders folders = Folders.getInstance();
+
     /**
      * Creates new form Main
      */
     public Main() {
         initComponents();
+        if (!folders.isEmpty()) setText();
+    }
+
+    public void setText() {
+        modsFolderLabel.setText(folders.getModsFolder().getAbsolutePath());
+        M3FolderLabel.setText(folders.getM3Folder().getAbsolutePath());
     }
 
     /**
@@ -299,11 +313,28 @@ public class Main extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void modsFolderBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_modsFolderBtnActionPerformed
-        // TODO add your handling code here:
+        File chosenFolder = Files.folderChooser(this);
+        if (chosenFolder == null)
+            JOptionPane.showMessageDialog(this, "Please select your mods folder.", "Error", JOptionPane.ERROR_MESSAGE);
+        else {
+            folders = new Folders(chosenFolder, true);
+            setText();
+        }
+
     }//GEN-LAST:event_modsFolderBtnActionPerformed
 
     private void m3FolderBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_m3FolderBtnActionPerformed
-        // TODO add your handling code here:
+        if (folders.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please select your mods folder first.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        File chosenFolder = Files.folderChooser(this);
+        if (chosenFolder == null)
+            JOptionPane.showMessageDialog(this, "Please select your M3 folder.", "Errpr", JOptionPane.ERROR_MESSAGE);
+        else {
+            folders = new Folders(chosenFolder, true);
+            setText();
+        }
     }//GEN-LAST:event_m3FolderBtnActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed

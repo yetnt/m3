@@ -5,6 +5,10 @@
 package com.m3.util;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.function.Consumer;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -37,5 +41,25 @@ public class Files {
             chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             chooser.setAcceptAllFileFilterUsed(false);
         }, frameParent);
+    }
+
+    public static ArrayList<String> readLines(File file) {
+        ArrayList<String> lines = new ArrayList<>();
+        try (Scanner sc = new Scanner(file)) {
+            while (sc.hasNextLine()) {
+                lines.add(sc.nextLine());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return lines;
+    }
+
+    public static void writeLines(File file, Consumer<PrintWriter> writer, boolean append) {
+        try (PrintWriter pw = new PrintWriter(new FileWriter(file), append)) {
+            writer.accept(pw);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
