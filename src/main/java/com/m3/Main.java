@@ -344,7 +344,7 @@ public class Main extends javax.swing.JFrame {
     }//GEN-LAST:event_addModsToVersionBtnActionPerformed
 
     private void backupBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backupBtnActionPerformed
-        // TODO add your handling code here:
+        Folders.homeFiles.backupModsFolder();
     }//GEN-LAST:event_backupBtnActionPerformed
 
     private void viewBackupBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewBackupBtnActionPerformed
