@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class M3Files {
 
-    private final File VERSIONS_FOLDER;
+    public final File VERSIONS_FOLDER;
     private final File MODSFOLDER_TXT;
     private final File BACKUPS_FOLDER;
 
@@ -72,8 +72,8 @@ public class M3Files {
             }
         }, false);
         // Also delete the actual folder and its contents
-        if (victim.getFile().exists()) {
-            deleteDirectory(victim.getFile());
+        if (victim.getFolder().exists()) {
+            deleteDirectory(victim.getFolder());
         }
     }
 
@@ -104,5 +104,9 @@ public class M3Files {
 
     public File getBackupsFolder() {
         return BACKUPS_FOLDER;
+    }
+
+    public void addModFolder(ModFolder modFolder) {
+        writeModFolder(modFolder);
     }
 }

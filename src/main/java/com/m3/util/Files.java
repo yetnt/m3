@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Scanner;
 import java.util.function.Consumer;
 import javax.swing.JFileChooser;
@@ -29,6 +30,22 @@ public class Files {
 
         int result = chooser.showOpenDialog(frameParent);
         return result == JFileChooser.APPROVE_OPTION ? chooser.getSelectedFile(): null;
+    }
+
+
+    public static ArrayList<File> multipleFileChooser(Consumer<JFileChooser> chooserConfigure, JFrame frameParent) {
+        JFileChooser chooser = new JFileChooser();
+        chooserConfigure.accept(chooser);
+        chooser.setMultiSelectionEnabled(true);
+
+        int result = chooser.showOpenDialog(frameParent);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            ArrayList<File> selectedFiles = new ArrayList<>();
+            Collections.addAll(selectedFiles, chooser.getSelectedFiles());
+            return selectedFiles;
+        } else {
+            return null;
+        }
     }
     
     /**
@@ -56,7 +73,7 @@ public class Files {
     }
 
     public static void writeLines(File file, Consumer<PrintWriter> writer, boolean append) {
-        try (PrintWriter pw = new PrintWriter(new FileWriter(file), append)) {
+        try (PrintWriter pw = new PrintWriter(new FileWriter(file, append), true)) {
             writer.accept(pw);
         } catch (Exception e) {
             throw new RuntimeException(e);

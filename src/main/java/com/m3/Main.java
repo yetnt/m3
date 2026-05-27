@@ -5,12 +5,14 @@
 package com.m3;
 
 import com.m3.files.Folders;
+import com.m3.files.ModFolder;
 import com.m3.util.Files;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  *
@@ -19,6 +21,7 @@ import java.io.IOException;
 public class Main extends javax.swing.JFrame {
 
     public Folders folders = Folders.getInstance();
+    public ModFolder selectedFolder;
 
     /**
      * Creates new form Main
@@ -336,11 +339,73 @@ public class Main extends javax.swing.JFrame {
     }//GEN-LAST:event_m3FolderBtnActionPerformed
 
     private void addNewVersionBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addNewVersionBtnActionPerformed
-        // TODO add your handling code here:
+        String name = JOptionPane.showInputDialog("Enter the name of the new version:");
+        if (name == null) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "No name was given so folder creation has been terminated",
+                    "Info",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+            return;
+        }
+
+        ModFolder modFolder = ModFolder.create(name);
+        selectedFolder = modFolder;
+
+        Folders.m3Files.addModFolder(modFolder);
     }//GEN-LAST:event_addNewVersionBtnActionPerformed
 
     private void addModsToVersionBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addModsToVersionBtnActionPerformed
-        // TODO add your handling code here:
+
+        JOptionPane.showMessageDialog(this,
+                "Make sure to select mods of the same version!");
+
+        ArrayList<File> mods = Files.multipleFileChooser(
+                (chooser) -> {
+                    chooser.setDialogTitle("Select Mods");
+                    chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                    // only .jar files
+                    chooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
+                        public boolean accept(File f) {
+                            return f.isDirectory() || f.getName().toLowerCase().endsWith(".jar");
+                        }
+
+                        public String getDescription() {
+                            return "JAR Files (*.jar)";
+                        }
+                    });
+                },
+                this
+        );
+
+        if (mods == null) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "No mods were selected, so the version was not created.",
+                    "Info",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+            return;
+        }
+
+        (new ArrayList<>(mods)).forEach(mod -> {
+            if (!mod.isFile() || !mod.getName().toLowerCase().endsWith(".jar")) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        mod.getName() + " is not a valid mod file (must be a .jar file). Skipping this file.",
+                        "Warning",
+                        JOptionPane.WARNING_MESSAGE
+                );
+                mods.remove(mod);
+            }
+        });
+
+        selectedFolder.addMods(mods.toArray(new File[0]));
+
+        if (new BooleanDialogue(this, "should M3 delete the old mod files?").response()) {
+            mods.forEach(File::delete);
+        }
     }//GEN-LAST:event_addModsToVersionBtnActionPerformed
 
     private void backupBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backupBtnActionPerformed

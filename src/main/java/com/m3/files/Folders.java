@@ -45,6 +45,9 @@ public class Folders {
     public Folders(File modsFolder, boolean write) {
         setModsFolder(modsFolder);
         if (write) homeFiles.writeM3Folder(DIR_M3, DIR_MODS);
+        m3Files.addModFolder(
+                ModFolder.create("Empty Preset")
+        );
         isEmpty = false;
     }
 
