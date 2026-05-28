@@ -2,6 +2,7 @@ package com.m3.methods;
 
 import com.m3.files.Folders;
 import com.m3.files.ModFolder;
+import com.m3.util.Files;
 
 import java.io.File;
 
@@ -13,20 +14,25 @@ public interface MovementMethod {
     /**
      * Method that implementors need to override for application of a mod folder. So that be the actual {@link File}
      * I/O of moving or copying the mods or otherwise into the user's mod folder
-     * @param folders The folders instance.
-     * @param oldFolder The old mod folder that is currently within the mods
+     *
+     * @param folders   The folders instance.
      * @param newFolder The new mod folder to replace it with.
+     * @param config
      * @implSpec If, the {@code oldFolder} and {@code newFolder} are identical then that means the user has added a new
      * mod .jar file to M3's copy but since this same folder is selected and in the mods folder, it needs to be recopied.
      */
-    void apply(Folders folders, ModFolder oldFolder, ModFolder newFolder);
+    void apply(Folders folders, ModFolder newFolder, MovementConfig config);
 
     /**
      * Method that implementors need to override such as to clean the mods folder for fresh new state.
-     * @param folders The folders instance.
-     * @param folder The mod folder to clean.
+     *
+     * @param folders      The folders instance.
+     * @param folderInMods This is the current mod folder loaded within the mods file.
+     * @implSpec The point of this method, is such that other methods can start using the folder structure
+     * after it's been clean. meaning the implementation has to make sure it cleans the folder to the state where
+     * there is nothing within the mods folder and the mods folder exists.
      */
-    void clean(Folders folders, ModFolder folder);
+    void clean(Folders folders, ModFolder folderInMods);
 
     /**
      * Helper method to clear the mod folder.
@@ -42,7 +48,17 @@ public interface MovementMethod {
     }
 
     /**
-     * An enumeration of the different movement methods available in M3.
+     * Backs up the mods folder to both M3's internal backup folder and the user's home directory backup folder.
+     * This method leverages the {@link Files#backupModsFolder(File)} utility to perform the backup operations.
+     * It's a default method, meaning implementing classes don't have to provide their own implementation unless needed.
+     */
+    default void backup() {
+        Files.backupModsFolder(Folders.m3Files.getBackupsFolder());
+        Files.backupModsFolder(Folders.homeFiles.BACKUP_FOLDER);
+    }
+
+    /**
+     * An enum of the different movement methods available in M3.
      */
     enum Type {
         MOVE(new MMove(), "MOVE"),

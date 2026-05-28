@@ -2,40 +2,60 @@ package com.m3.methods;
 
 import com.m3.files.Folders;
 import com.m3.files.ModFolder;
-import com.m3.util.Files;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Arrays;
 
-import static java.nio.file.Files.copy;
-
+/**
+ * An implementation of {@link MovementMethod} which aims to copy the mods around.
+ * <p>
+ *     How it works is, when a {@link ModFolder} is selected, it simply fetches all the mods within it and copies
+ *     it over into the user's Minecraft mods file.
+ * </p>
+ */
 public class MCopy implements MovementMethod {
     @Override
-    public void apply(Folders folders, ModFolder oldFolder, ModFolder newFolder) {
-        // we dont care about the oldFolder
+    public void apply(Folders folders, ModFolder newFolder, MovementConfig config) {
+        if (config.getType() == MovementConfig.Type.UPDATE) {
+            // Fast path, we only need to copy the files over.
+            ArrayList<File> newMods = config.getNewMods();
+            newMods.forEach(
+                    mod -> copy(mod, new File(folders.getModsFolder(), mod.getName()))
+            );
+            return;
+        }
 
         // 1. Clean
-        clean(folders, oldFolder);
-        clearModsFolder(folders);
+        clean(folders, config.getOldFolder());
 
         // 2. Copy
         File[] file = newFolder.getFolder().listFiles();
-        if (file != null) {
-            for (File f : file) {
-                try {
-                    copy(f.toPath(), new File(folders.getModsFolder(), f.getName()).toPath(),
-                            StandardCopyOption.REPLACE_EXISTING);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+        if (file != null)
+            Arrays.stream(file)
+                    .forEach(f -> copy(f, new File(folders.getModsFolder(), f.getName())));
+
+    }
+
+    /**
+     * Copies a file from one location to another, replacing the destination file if it already exists.
+     * @param oldFile The source file to copy.
+     * @param newFile The destination file.
+     */
+    private void copy(File oldFile, File newFile) {
+        try {
+            Files.copy(oldFile.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     @Override
-    public void clean(Folders folders, ModFolder folder) {
+    public void clean(Folders folders, ModFolder folderInMods) {
         // backup whatever is in the mods folder
-        Files.backupModsFolder(Folders.m3Files.getBackupsFolder());
-        Files.backupModsFolder(Folders.homeFiles.BACKUP_FOLDER);
+        backup();
+        clearModsFolder(folders);
     }
 }

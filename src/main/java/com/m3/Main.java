@@ -6,8 +6,10 @@ package com.m3;
 
 import com.m3.files.Folders;
 import com.m3.files.ModFolder;
+import com.m3.methods.MovementConfig;
 import com.m3.methods.MovementMethod;
 import com.m3.util.Files;
+import com.m3.util.SystemCapabilities;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,6 +17,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -60,13 +63,19 @@ public class Main extends javax.swing.JFrame {
     }
 
     public void setMethodRadios() {
-        setMethodRadios(Folders.m3Files.getMethodToUse());
+        setMethodRadios(Folders.m3Files.getMethodToUse(), false);
         movementMethods.get(selectedMethod).setSelected(true);
     }
 
-    public void setMethodRadios(MovementMethod.Type method) {
+    public void setMethodRadios(MovementMethod.Type method, boolean clean) {
+        if (clean)
+            selectedMethod.getMethod().clean(folders, selectedFolder);
         selectedMethod = method;
         Folders.m3Files.setMethodToUse(method);
+        if (clean) {
+            // use the new method to set the current selected folder.
+            selectedMethod.getMethod().apply(folders, selectedFolder, new MovementConfig(MovementConfig.Type.METHOD_CHANGE));
+        }
     }
 
     public void disableAllButtons() {
@@ -118,14 +127,14 @@ public class Main extends javax.swing.JFrame {
             ModFolder old = selectedFolder;
             selectedFolder = folder;
             System.out.println("Set the folder to " + folder.getName());
-            selectedMethod.getMethod().apply(folders, old, folder);
+            selectedMethod.getMethod().apply(folders, folder, new MovementConfig(old));
             enableAllButtons();
             JOptionPane.showMessageDialog(this,
                     "Loaded the following mods: \n\n" +
-                            folder.getModNames()
-                                    .stream()
-                                    .map(s -> s + "\n\t\t")
-                                    .reduce("", String::concat)
+                            (selectedMethod == MovementMethod.Type.MOVE ?
+                                    Arrays.stream(folders.getModsFolder().listFiles()).map(File::getName)
+                                    : folder.getModNames().stream()
+                            ).map(s -> s + "\n\t\t").reduce("", String::concat)
                     ,
                     "Success", JOptionPane.INFORMATION_MESSAGE);
         };
@@ -514,17 +523,32 @@ public class Main extends javax.swing.JFrame {
             return;
         }
 
-        (new ArrayList<>(mods)).forEach(mod -> {
-            if (!mod.isFile() || !mod.getName().toLowerCase().endsWith(".jar")) {
+        ArrayList<File> invalidMods = mods.stream()
+                .filter(mod -> !mod.isFile() || !mod.getName().toLowerCase().endsWith(".jar"))
+                .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+
+
+        if (!invalidMods.isEmpty()) {
+            mods.removeAll(invalidMods);
+            if (mods.isEmpty()) {
+                // All mods invalid.
                 JOptionPane.showMessageDialog(
                         this,
-                        mod.getName() + " is not a valid mod file (must be a .jar file). Skipping this file.",
-                        "Warning",
-                        JOptionPane.WARNING_MESSAGE
+                        "No valid mods were selected, so no mods were added to the version.",
+                        "Info",
+                        JOptionPane.INFORMATION_MESSAGE
                 );
-                mods.remove(mod);
+                return;
+            } else {
+                String invalidModNames = invalidMods.stream()
+                        .map(File::getName)
+                        .reduce("", (acc, name) -> acc + name + "\n");
+                JOptionPane.showMessageDialog(this,
+                        "The following files are not valid mod files (must be .jar files) and will be skipped:\n\n"
+                                + invalidModNames,
+                        "Warning", JOptionPane.WARNING_MESSAGE);
             }
-        });
+        }
 
         selectedFolder.addMods(mods.toArray(new File[0]));
 
@@ -533,7 +557,7 @@ public class Main extends javax.swing.JFrame {
         }
 
         // since the current folder was edited. Redo the operation
-        selectedMethod.getMethod().apply(folders, selectedFolder, selectedFolder);
+        selectedMethod.getMethod().apply(folders, selectedFolder, new MovementConfig(mods));
     }//GEN-LAST:event_addModsToVersionBtnActionPerformed
 
     private void backupBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backupBtnActionPerformed
@@ -592,16 +616,32 @@ public class Main extends javax.swing.JFrame {
             movementMethods.get(selectedMethod).setSelected(true);
             return;
         }
-        setMethodRadios(MovementMethod.Type.MOVE);
+        setMethodRadios(MovementMethod.Type.MOVE, true);
     }//GEN-LAST:event_setToMoveActionPerformed
 
     private void setToCopyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setToCopyActionPerformed
         if (selectedMethod == MovementMethod.Type.COPY) return;
-        setMethodRadios(MovementMethod.Type.COPY);
+        setMethodRadios(MovementMethod.Type.COPY, true);
     }//GEN-LAST:event_setToCopyActionPerformed
 
     private void setToSymlinkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setToSymlinkActionPerformed
         if (selectedMethod == MovementMethod.Type.SYMLINK) return;
+
+        if (!SystemCapabilities.canCreateSymlinks()) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Your OS does not allow M3 to create symbolic links."
+                            + "\n\n" + "If you're on windows please try the following fixes to enable symlink method:"
+                            + "\n" + "1.\tRunning the app as an administrator"
+                            + "\n" + "2.\tTurning on Developer Mode (Windows 10/11)"
+                            + "\n\n" + "If none work. My condolences.",
+                    "os Said no no",
+                    JOptionPane.ERROR_MESSAGE
+            );
+            setToSymlink.setSelected(false);
+            movementMethods.get(selectedMethod).setSelected(true);
+            return;
+        }
         if (
                 !new BooleanDialogue(
                         this,
@@ -612,7 +652,7 @@ public class Main extends javax.swing.JFrame {
             movementMethods.get(selectedMethod).setSelected(true);
             return;
         }
-        setMethodRadios(MovementMethod.Type.SYMLINK);
+        setMethodRadios(MovementMethod.Type.SYMLINK, true);
     }//GEN-LAST:event_setToSymlinkActionPerformed
 
     /**

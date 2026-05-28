@@ -1,7 +1,5 @@
 package com.m3.files;
 
-import com.m3.Main;
-
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
@@ -10,6 +8,11 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * A ModFolder represents a folder within the {@link M3Files#MODS_FOLDER} which stores a set of mods, usually of
+ * the same version.
+ * This class provides methods to manage the mod folder, including creating, renaming, and adding mods to it.
+ */
 public class ModFolder {
 
     /**
@@ -37,7 +40,7 @@ public class ModFolder {
     }
 
     public static ModFolder create(String name, UUID id) {
-        File folder = new File(Folders.m3Files.VERSIONS_FOLDER, String.valueOf(id));
+        File folder = new File(Folders.m3Files.MODS_FOLDER, String.valueOf(id));
         folder.mkdirs();
         return new ModFolder(folder, name, id, 0);
     }

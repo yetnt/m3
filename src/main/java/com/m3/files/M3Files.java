@@ -15,7 +15,7 @@ import java.util.UUID;
  */
 public class M3Files {
 
-    public final File VERSIONS_FOLDER;
+    public final File MODS_FOLDER;
     private final TextFile MODSFOLDER_TXT;
     private final TextFile CONFIG_TXT;
     private final File BACKUPS_FOLDER;
@@ -28,13 +28,13 @@ public class M3Files {
      * @param m3Folder The root directory for M3 files.
      */
     public M3Files(File m3Folder) {
-        VERSIONS_FOLDER = new File(m3Folder, "mod-versions");
+        MODS_FOLDER = new File(m3Folder, "mod-versions");
         MODSFOLDER_TXT = new TextFile(m3Folder, "mods");
         CONFIG_TXT = new TextFile(m3Folder, "config");
         BACKUPS_FOLDER = new File(m3Folder, "backups");
 
-        if (!VERSIONS_FOLDER.exists())
-            VERSIONS_FOLDER.mkdirs();
+        if (!MODS_FOLDER.exists())
+            MODS_FOLDER.mkdirs();
         if (!BACKUPS_FOLDER.exists())
             BACKUPS_FOLDER.mkdirs();
     }
@@ -103,7 +103,7 @@ public class M3Files {
             if (parts.length != 2) throw new RuntimeException("Invalid mod folder line");
             UUID uuid = UUID.fromString(parts[0]);
             String name = parts[1];
-            File file = new File(VERSIONS_FOLDER, uuid.toString());
+            File file = new File(MODS_FOLDER, uuid.toString());
             folders.add(new ModFolder(file, name, uuid, file.listFiles() == null ? 0 : Objects.requireNonNull(file.listFiles()).length));
         }
 
