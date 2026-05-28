@@ -6,13 +6,17 @@ package com.m3;
 
 import com.m3.files.Folders;
 import com.m3.files.ModFolder;
+import com.m3.methods.MovementMethod;
 import com.m3.util.Files;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.UUID;
 
 /**
  *
@@ -22,13 +26,109 @@ public class Main extends javax.swing.JFrame {
 
     public Folders folders = Folders.getInstance();
     public ModFolder selectedFolder;
+    private MovementMethod.Type selectedMethod;
+    private HashMap<UUID, JRadioButton> modFolderRadioButtons = new HashMap<>();
+    private HashMap<MovementMethod.Type, JRadioButton> movementMethods = new HashMap<>();
 
     /**
      * Creates new form Main
      */
     public Main() {
         initComponents();
-        if (!folders.isEmpty()) setText();
+        if (folders.isEmpty()) {
+            return;
+        }
+        setText();
+        ArrayList<ModFolder> folders = Folders.m3Files.readModFolders();
+        UUID selectedModFolder = Folders.m3Files.getSelectedVersion();
+        for (ModFolder modFolder : folders) {
+            buttonGrpPanel.add(modFolder.getBtn());
+            buttonGroup1.add(modFolder.getBtn());
+            modFolder.getBtn().addActionListener(getActionListener(modFolder));
+            modFolderRadioButtons.put(modFolder.getId(), modFolder.getBtn());
+            if (selectedModFolder != null && selectedModFolder.equals(modFolder.getId())) {
+                modFolder.getBtn().setSelected(true);
+                selectedFolder = modFolder;
+            }
+        }
+
+        movementMethods.put(MovementMethod.Type.COPY, setToCopy);
+        movementMethods.put(MovementMethod.Type.MOVE, setToMove);
+        movementMethods.put(MovementMethod.Type.SYMLINK, setToSymlink);
+
+        setMethodRadios();
+    }
+
+    public void setMethodRadios() {
+        setMethodRadios(Folders.m3Files.getMethodToUse());
+        movementMethods.get(selectedMethod).setSelected(true);
+    }
+
+    public void setMethodRadios(MovementMethod.Type method) {
+        selectedMethod = method;
+        Folders.m3Files.setMethodToUse(method);
+    }
+
+    public void disableAllButtons() {
+        modsFolderBtn.setEnabled(false);
+        m3FolderBtn.setEnabled(false);
+        addModsToVersionBtn.setEnabled(false);
+        addNewVersionBtn.setEnabled(false);
+        backupBtn.setEnabled(false);
+        viewBackupBtn.setEnabled(false);
+        viewsecondBackupBtn.setEnabled(false);
+        setCurrentBtn.setEnabled(false);
+        renameCurrentBtn.setEnabled(false);
+        setToCopy.setEnabled(false);
+//        setToMove.setEnabled(false);
+//        setToSymlink.setEnabled(false);
+    }
+
+    public void enableAllButtons() {
+        modsFolderBtn.setEnabled(true);
+        m3FolderBtn.setEnabled(true);
+        addModsToVersionBtn.setEnabled(true);
+        addNewVersionBtn.setEnabled(true);
+        backupBtn.setEnabled(true);
+        viewBackupBtn.setEnabled(true);
+        viewsecondBackupBtn.setEnabled(true);
+        setCurrentBtn.setEnabled(true);
+        renameCurrentBtn.setEnabled(true);
+        setToCopy.setEnabled(true);
+//        setToMove.setEnabled(true);
+//        setToSymlink.setEnabled(true);
+    }
+
+
+    public ActionListener getActionListener(ModFolder folder) {
+        return (e) -> {
+            if (selectedFolder == folder) return; // already set.
+            if (
+                    !new BooleanDialogue(
+                            this,
+                            "Apply " + folder.getName() + " to your mods folder?"
+                    ).response()
+            ) {
+                folder.getBtn().setSelected(false);
+                selectedFolder.getBtn().setSelected(true);
+                return;
+            }
+            disableAllButtons();
+            Folders.m3Files.setSelectedVersion(folder);
+            ModFolder old = selectedFolder;
+            selectedFolder = folder;
+            System.out.println("Set the folder to " + folder.getName());
+            selectedMethod.getMethod().apply(folders, old, folder);
+            enableAllButtons();
+            JOptionPane.showMessageDialog(this,
+                    "Loaded the following mods: \n\n" +
+                            folder.getModNames()
+                                    .stream()
+                                    .map(s -> s + "\n\t\t")
+                                    .reduce("", String::concat)
+                    ,
+                    "Success", JOptionPane.INFORMATION_MESSAGE);
+        };
     }
 
     public void setText() {
@@ -45,6 +145,8 @@ public class Main extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
+        buttonGroup2 = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         modsFolderLabel = new javax.swing.JLabel();
@@ -62,14 +164,14 @@ public class Main extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
-        jRadioButton1 = new javax.swing.JRadioButton();
-        jRadioButton2 = new javax.swing.JRadioButton();
-        jRadioButton3 = new javax.swing.JRadioButton();
-        jRadioButton4 = new javax.swing.JRadioButton();
-        jRadioButton5 = new javax.swing.JRadioButton();
         setCurrentBtn = new javax.swing.JButton();
         renameCurrentBtn = new javax.swing.JButton();
         jLabel7 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        buttonGrpPanel = new javax.swing.JPanel();
+        setToCopy = new javax.swing.JRadioButton();
+        setToMove = new javax.swing.JRadioButton();
+        setToSymlink = new javax.swing.JRadioButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -221,21 +323,6 @@ public class Main extends javax.swing.JFrame {
         jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel6.setText("Click a version to replace the mods folder with that version's mods");
 
-        jRadioButton1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jRadioButton1.setText("jRadioButton1");
-
-        jRadioButton2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jRadioButton2.setText("jRadioButton1");
-
-        jRadioButton3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jRadioButton3.setText("jRadioButton1");
-
-        jRadioButton4.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jRadioButton4.setText("jRadioButton1");
-
-        jRadioButton5.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jRadioButton5.setText("jRadioButton1");
-
         setCurrentBtn.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         setCurrentBtn.setText("Set Current Mods Folder Version");
         setCurrentBtn.addActionListener(new java.awt.event.ActionListener() {
@@ -256,6 +343,33 @@ public class Main extends javax.swing.JFrame {
         jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel7.setText("M3");
 
+        buttonGrpPanel.setLayout(new javax.swing.BoxLayout(buttonGrpPanel, javax.swing.BoxLayout.Y_AXIS));
+        jScrollPane1.setViewportView(buttonGrpPanel);
+
+        buttonGroup2.add(setToCopy);
+        setToCopy.setText("Copy");
+        setToCopy.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                setToCopyActionPerformed(evt);
+            }
+        });
+
+        buttonGroup2.add(setToMove);
+        setToMove.setText("Move");
+        setToMove.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                setToMoveActionPerformed(evt);
+            }
+        });
+
+        buttonGroup2.add(setToSymlink);
+        setToSymlink.setText("Symlink");
+        setToSymlink.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                setToSymlinkActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -264,23 +378,18 @@ public class Main extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jRadioButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(renameCurrentBtn, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(setCurrentBtn, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jRadioButton5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jRadioButton4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jRadioButton3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jRadioButton2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(0, 0, Short.MAX_VALUE)))
-                        .addGap(23, 23, 23))))
+                        .addComponent(setToCopy, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(28, 28, 28)
+                        .addComponent(setToMove, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addComponent(setToSymlink, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(renameCurrentBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(setCurrentBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(23, 23, 23))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -293,24 +402,22 @@ public class Main extends javax.swing.JFrame {
                 .addComponent(setCurrentBtn)
                 .addGap(18, 18, 18)
                 .addComponent(renameCurrentBtn)
-                .addGap(44, 44, 44)
-                .addComponent(jRadioButton1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jRadioButton2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jRadioButton3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jRadioButton4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jRadioButton5)
-                .addGap(78, 78, 78)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(38, 38, 38)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(setToCopy)
+                    .addComponent(setToMove)
+                    .addComponent(setToSymlink))
+                .addGap(40, 40, 40)
                 .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(87, 87, 87))
+                .addContainerGap())
         );
 
         getContentPane().add(jPanel2, java.awt.BorderLayout.EAST);
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void modsFolderBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_modsFolderBtnActionPerformed
@@ -333,7 +440,7 @@ public class Main extends javax.swing.JFrame {
         if (chosenFolder == null)
             JOptionPane.showMessageDialog(this, "Please select your M3 folder.", "Errpr", JOptionPane.ERROR_MESSAGE);
         else {
-            folders.setM3Folder(chosenFolder);
+            folders.setM3Folder(chosenFolder, false);
             setText();
         }
     }//GEN-LAST:event_m3FolderBtnActionPerformed
@@ -354,9 +461,27 @@ public class Main extends javax.swing.JFrame {
         selectedFolder = modFolder;
 
         Folders.m3Files.addModFolder(modFolder);
+
+        buttonGrpPanel.add(modFolder.getBtn());
+        modFolder.getBtn().setSelected(true);
+        buttonGroup1.add(modFolder.getBtn());
+        modFolder.getBtn().addActionListener(getActionListener(modFolder));
+        modFolderRadioButtons.put(modFolder.getId(), modFolder.getBtn());
+        buttonGrpPanel.revalidate();
+        buttonGrpPanel.repaint();
     }//GEN-LAST:event_addNewVersionBtnActionPerformed
 
     private void addModsToVersionBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addModsToVersionBtnActionPerformed
+
+        if (selectedFolder.getId().equals(ModFolder.EMPTY_PRESET)) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "You cannot add mods to the Empty Preset. Please select or create a new version folder.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
 
         JOptionPane.showMessageDialog(this,
                 "Make sure to select mods of the same version!");
@@ -406,10 +531,14 @@ public class Main extends javax.swing.JFrame {
         if (new BooleanDialogue(this, "should M3 delete the old mod files?").response()) {
             mods.forEach(File::delete);
         }
+
+        // since the current folder was edited. Redo the operation
+        selectedMethod.getMethod().apply(folders, selectedFolder, selectedFolder);
     }//GEN-LAST:event_addModsToVersionBtnActionPerformed
 
     private void backupBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backupBtnActionPerformed
-        Folders.homeFiles.backupModsFolder();
+        Files.backupModsFolder(Folders.m3Files.getBackupsFolder());
+        Files.backupModsFolder(Folders.homeFiles.BACKUP_FOLDER);
     }//GEN-LAST:event_backupBtnActionPerformed
 
     private void viewBackupBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewBackupBtnActionPerformed
@@ -433,8 +562,58 @@ public class Main extends javax.swing.JFrame {
     }//GEN-LAST:event_setCurrentBtnActionPerformed
 
     private void renameCurrentBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_renameCurrentBtnActionPerformed
-        // TODO add your handling code here:
+        String newName = JOptionPane.showInputDialog(this,
+
+"Enter new name for " + selectedFolder.getName(),
+                "Rename Mod Folder",
+                JOptionPane.QUESTION_MESSAGE
+        );
+        if (newName == null || newName.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Name cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        selectedFolder.setName(newName);
+        selectedFolder.getBtn().setText(newName);
+        Folders.m3Files.replaceModFolder(selectedFolder);
+        buttonGrpPanel.revalidate();
+        buttonGrpPanel.repaint();
     }//GEN-LAST:event_renameCurrentBtnActionPerformed
+
+    private void setToMoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setToMoveActionPerformed
+        if (selectedMethod == MovementMethod.Type.MOVE) return;
+        if (
+                !new BooleanDialogue(
+                        this,
+                        "<html>This method saves space but is more risky than copy in terms of I/O. Proceed?</html>"
+                        ).response()
+        ) {
+            setToMove.setSelected(false);
+            movementMethods.get(selectedMethod).setSelected(true);
+            return;
+        }
+        setMethodRadios(MovementMethod.Type.MOVE);
+    }//GEN-LAST:event_setToMoveActionPerformed
+
+    private void setToCopyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setToCopyActionPerformed
+        if (selectedMethod == MovementMethod.Type.COPY) return;
+        setMethodRadios(MovementMethod.Type.COPY);
+    }//GEN-LAST:event_setToCopyActionPerformed
+
+    private void setToSymlinkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setToSymlinkActionPerformed
+        if (selectedMethod == MovementMethod.Type.SYMLINK) return;
+        if (
+                !new BooleanDialogue(
+                        this,
+                        "<html>This method saves space but now relies on referencing which can cause problems on different systems. Proceed?</html>"
+                ).response()
+        ) {
+            setToSymlink.setSelected(false);
+            movementMethods.get(selectedMethod).setSelected(true);
+            return;
+        }
+        setMethodRadios(MovementMethod.Type.SYMLINK);
+    }//GEN-LAST:event_setToSymlinkActionPerformed
 
     /**
      * @param args the command line arguments
@@ -476,6 +655,9 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JButton addModsToVersionBtn;
     private javax.swing.JButton addNewVersionBtn;
     private javax.swing.JButton backupBtn;
+    private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.ButtonGroup buttonGroup2;
+    private javax.swing.JPanel buttonGrpPanel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
@@ -484,17 +666,16 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JRadioButton jRadioButton1;
-    private javax.swing.JRadioButton jRadioButton2;
-    private javax.swing.JRadioButton jRadioButton3;
-    private javax.swing.JRadioButton jRadioButton4;
-    private javax.swing.JRadioButton jRadioButton5;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JButton m3FolderBtn;
     private javax.swing.JButton modsFolderBtn;
     private javax.swing.JLabel modsFolderLabel;
     private javax.swing.JButton renameCurrentBtn;
     private javax.swing.JButton setCurrentBtn;
+    private javax.swing.JRadioButton setToCopy;
+    private javax.swing.JRadioButton setToMove;
+    private javax.swing.JRadioButton setToSymlink;
     private javax.swing.JButton viewBackupBtn;
     private javax.swing.JButton viewsecondBackupBtn;
     // End of variables declaration//GEN-END:variables

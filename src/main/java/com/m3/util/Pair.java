@@ -1,4 +1,4 @@
-package com.m3;
+package com.m3.util;
 
 public class Pair<T> {
     private final T first;
