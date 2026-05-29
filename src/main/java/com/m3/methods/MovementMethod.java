@@ -49,12 +49,12 @@ public interface MovementMethod {
 
     /**
      * Backs up the mods folder to both M3's internal backup folder and the user's home directory backup folder.
-     * This method leverages the {@link Files#backupModsFolder(File)} utility to perform the backup operations.
+     * This method leverages the {@link Files#backupMods(File)} utility to perform the backup operations.
      * It's a default method, meaning implementing classes don't have to provide their own implementation unless needed.
      */
     default void backup() {
-        Files.backupModsFolder(Folders.m3Files.getBackupsFolder());
-        Files.backupModsFolder(Folders.homeFiles.BACKUP_FOLDER);
+        Files.backupMods(Folders.m3Files.getBackupsFolder());
+        Files.backupMods(Folders.homeFiles.getBackupFolder());
     }
 
     /**

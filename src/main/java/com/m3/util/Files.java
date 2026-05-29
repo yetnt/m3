@@ -118,31 +118,49 @@ public class Files {
     }
 
     /**
-     * Backs up the mods folder by zipping its contents and saving it to a specified backup folder.
-     * The zip file is named with a timestamp.
-     * @param BACKUP_FOLDER The folder where the backup zip file will be saved.
+     * Backs up a given folder by zipping its contents. The zip file is named with a timestamp and a provided name,
+     * and saved into the specified backup folder.
+     * @param targetStore The directory where the backup zip file will be stored.
+     * @param name The base name for the backup zip file.
      */
-    public static void backupModsFolder(File BACKUP_FOLDER) {
+    public static void backupFolder(File targetStore, File target, String name) {
 
-        File[] amt = BACKUP_FOLDER.listFiles();
+        File[] amt = targetStore.listFiles();
         if (amt == null || amt.length == 0) {
             return;
         }
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
         String timestamp = sdf.format(new Date());
-        String zipFileName = "mods_backup_" + timestamp + ".zip";
-        File zipFile = new File(BACKUP_FOLDER, zipFileName);
+        String zipFileName = name + "_" + timestamp + ".zip";
+        File zipFile = new File(targetStore, zipFileName);
 
         try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFile))) {
-            File modsFolder = Folders.getInstance().getModsFolder();
-            if (modsFolder != null && modsFolder.exists() && modsFolder.isDirectory()) {
-                for (File file : modsFolder.listFiles()) {
+            if (target != null && target.exists() && target.isDirectory()) {
+                for (File file : target.listFiles()) {
                     Files.addFileToZip(file, file.getName(), zos);
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Backs up the current mods folder to a specified backup directory.
+     * The backup is a zip file named with a timestamp and "mods-backup".
+     * @param BACKUP_FOLDER The directory where the backup zip file will be stored.
+     */
+    public static void backupMods(File BACKUP_FOLDER) {
+        backupFolder(BACKUP_FOLDER, Folders.getInstance().getModsFolder(), "mods-backup");
+    }
+
+    public static void recursiveDelete(File file) {
+        if (file.isDirectory()) {
+            for (File file1 : file.listFiles()) {
+                recursiveDelete(file1);
+            }
+        }
+        file.delete();
     }
 }

@@ -19,9 +19,9 @@ import java.util.zip.ZipOutputStream;
  */
 public class HomeDirFies {
 
-    public final File CACHE_TXT = new TextFile(Folders.HOME_DIR_M3, "cache");
+    private final File CACHE_TXT = new TextFile(Folders.HOME_DIR_M3, "cache");
 
-    public final File BACKUP_FOLDER = new File(Path.of(Folders.HOME_DIR_M3.getAbsolutePath(), "backup").toUri());
+    private final File BACKUP_FOLDER = new File(Path.of(Folders.HOME_DIR_M3.getAbsolutePath(), "backup").toUri());
 
     /**
      * Constructs a new HomeDirFies object.
@@ -87,4 +87,7 @@ public class HomeDirFies {
         }
     }
 
+    public File getBackupFolder() {
+        return BACKUP_FOLDER;
+    }
 }

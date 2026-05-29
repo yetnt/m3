@@ -42,8 +42,7 @@ public class Folders {
     public Folders(File modsFolder, boolean write) {
         setModsFolder(modsFolder);
         if (write) homeFiles.writeM3Folder(DIR_M3, DIR_MODS);
-        ModFolder empty = ModFolder.create("Empty Preset", ModFolder.EMPTY_PRESET);
-        m3Files.addModFolder(empty);
+        addEmptyPreset();
         isEmpty = false;
     }
 
@@ -84,12 +83,16 @@ public class Folders {
             m3Files.writeConfig(config);
         }
         if (addEmptyPreset) {
-            ModFolder empty = ModFolder.create("Empty Preset", ModFolder.EMPTY_PRESET);
-            m3Files.addModFolder(empty);
+            addEmptyPreset();
         }
     }
 
     public boolean isEmpty() {
         return isEmpty;
+    }
+
+    public void addEmptyPreset() {
+        ModFolder empty = ModFolder.create("Empty Preset", ModFolder.EMPTY_PRESET);
+        m3Files.addModFolder(empty);
     }
 }

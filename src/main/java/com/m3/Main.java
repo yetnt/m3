@@ -33,15 +33,7 @@ public class Main extends javax.swing.JFrame {
     private HashMap<UUID, JRadioButton> modFolderRadioButtons = new HashMap<>();
     private HashMap<MovementMethod.Type, JRadioButton> movementMethods = new HashMap<>();
 
-    /**
-     * Creates new form Main
-     */
-    public Main() {
-        initComponents();
-        if (folders.isEmpty()) {
-            return;
-        }
-        setText();
+    private void setFolders() {
         ArrayList<ModFolder> folders = Folders.m3Files.readModFolders();
         UUID selectedModFolder = Folders.m3Files.getSelectedVersion();
         for (ModFolder modFolder : folders) {
@@ -54,12 +46,25 @@ public class Main extends javax.swing.JFrame {
                 selectedFolder = modFolder;
             }
         }
+    }
 
+    private void initFoldersAndMethods() {
         movementMethods.put(MovementMethod.Type.COPY, setToCopy);
         movementMethods.put(MovementMethod.Type.MOVE, setToMove);
         movementMethods.put(MovementMethod.Type.SYMLINK, setToSymlink);
-
+        setText();
         setMethodRadios();
+        setFolders();
+    }
+    /**
+     * Creates new form Main
+     */
+    public Main() {
+        initComponents();
+        if (folders.isEmpty()) {
+            return;
+        }
+        initFoldersAndMethods();
     }
 
     public void setMethodRadios() {
@@ -89,8 +94,8 @@ public class Main extends javax.swing.JFrame {
         setCurrentBtn.setEnabled(false);
         renameCurrentBtn.setEnabled(false);
         setToCopy.setEnabled(false);
-//        setToMove.setEnabled(false);
-//        setToSymlink.setEnabled(false);
+        setToMove.setEnabled(false);
+        setToSymlink.setEnabled(false);
     }
 
     public void enableAllButtons() {
@@ -104,8 +109,8 @@ public class Main extends javax.swing.JFrame {
         setCurrentBtn.setEnabled(true);
         renameCurrentBtn.setEnabled(true);
         setToCopy.setEnabled(true);
-//        setToMove.setEnabled(true);
-//        setToSymlink.setEnabled(true);
+        setToMove.setEnabled(true);
+        setToSymlink.setEnabled(true);
     }
 
 
@@ -435,9 +440,8 @@ public class Main extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Please select your mods folder.", "Error", JOptionPane.ERROR_MESSAGE);
         else {
             folders = new Folders(chosenFolder, true);
-            setText();
+            initFoldersAndMethods();
         }
-
     }//GEN-LAST:event_modsFolderBtnActionPerformed
 
     private void m3FolderBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_m3FolderBtnActionPerformed
@@ -445,12 +449,32 @@ public class Main extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Please select your mods folder first.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
+        // M3 already set a folder, so get it.
+        File old = folders.getM3Folder();
         File chosenFolder = Files.folderChooser(this);
-        if (chosenFolder == null)
+        if (chosenFolder == null) {
             JOptionPane.showMessageDialog(this, "Please select your M3 folder.", "Errpr", JOptionPane.ERROR_MESSAGE);
-        else {
-            folders.setM3Folder(chosenFolder, false);
-            setText();
+            return;
+        }
+
+        buttonGrpPanel.removeAll();
+        buttonGrpPanel.repaint();
+        buttonGrpPanel.revalidate();
+        buttonGroup1.clearSelection();
+
+        folders.setM3Folder(chosenFolder, false);
+        if (Folders.m3Files.MODS_FOLDER.listFiles().length == 0)
+            folders.addEmptyPreset();
+
+        initFoldersAndMethods();
+
+        if (!old.equals(chosenFolder) &&
+                new BooleanDialogue(this,
+                        "A previous M3 location was created (" + old.getAbsolutePath() + "). Would you like to delete it? (A backup will be saved in the secondary backup location)")
+                        .response()
+        ) {
+            Files.backupFolder(Folders.homeFiles.getBackupFolder(), old, "m3-folder-backup");
+            Files.recursiveDelete(old);
         }
     }//GEN-LAST:event_m3FolderBtnActionPerformed
 
@@ -561,8 +585,8 @@ public class Main extends javax.swing.JFrame {
     }//GEN-LAST:event_addModsToVersionBtnActionPerformed
 
     private void backupBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backupBtnActionPerformed
-        Files.backupModsFolder(Folders.m3Files.getBackupsFolder());
-        Files.backupModsFolder(Folders.homeFiles.BACKUP_FOLDER);
+        Files.backupMods(Folders.m3Files.getBackupsFolder());
+        Files.backupMods(Folders.homeFiles.getBackupFolder());
     }//GEN-LAST:event_backupBtnActionPerformed
 
     private void viewBackupBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewBackupBtnActionPerformed
@@ -575,7 +599,7 @@ public class Main extends javax.swing.JFrame {
 
     private void viewsecondBackupBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewsecondBackupBtnActionPerformed
         try {
-            Desktop.getDesktop().open(Folders.homeFiles.BACKUP_FOLDER);
+            Desktop.getDesktop().open(Folders.homeFiles.getBackupFolder());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -11,6 +11,7 @@ public class TextFile extends File {
      */
     public TextFile(File parent, String fileName) {
         super(parent, fileName + ".txt");
+        this.getParentFile().mkdirs();
         if (!this.exists())
             try {
                 this.createNewFile();
