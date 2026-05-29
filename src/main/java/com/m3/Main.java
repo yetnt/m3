@@ -177,7 +177,6 @@ public class Main extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         M3FolderLabel = new javax.swing.JLabel();
         m3FolderBtn = new javax.swing.JButton();
-        addModsToVersionBtn = new javax.swing.JButton();
         addNewVersionBtn = new javax.swing.JButton();
         backupBtn = new javax.swing.JButton();
         viewBackupBtn = new javax.swing.JButton();
@@ -195,6 +194,7 @@ public class Main extends javax.swing.JFrame {
         setToCopy = new javax.swing.JRadioButton();
         setToMove = new javax.swing.JRadioButton();
         setToSymlink = new javax.swing.JRadioButton();
+        addModsToVersionBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Minecraft Mod Mover");
@@ -231,16 +231,8 @@ public class Main extends javax.swing.JFrame {
             }
         });
 
-        addModsToVersionBtn.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        addModsToVersionBtn.setText("Add Mods To Version");
-        addModsToVersionBtn.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addModsToVersionBtnActionPerformed(evt);
-            }
-        });
-
         addNewVersionBtn.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        addNewVersionBtn.setText("Add New Version");
+        addNewVersionBtn.setText("Add New Pack");
         addNewVersionBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addNewVersionBtnActionPerformed(evt);
@@ -286,7 +278,6 @@ public class Main extends javax.swing.JFrame {
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(modsFolderBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(addModsToVersionBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(addNewVersionBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(rightPanelLayout.createSequentialGroup()
                         .addComponent(backupBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -314,12 +305,10 @@ public class Main extends javax.swing.JFrame {
                 .addComponent(M3FolderLabel)
                 .addGap(18, 18, 18)
                 .addComponent(m3FolderBtn)
-                .addGap(76, 76, 76)
+                .addGap(44, 44, 44)
                 .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
-                .addComponent(addNewVersionBtn)
-                .addGap(18, 18, 18)
-                .addComponent(addModsToVersionBtn)
+                .addComponent(addNewVersionBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(rightPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(rightPanelLayout.createSequentialGroup()
@@ -327,7 +316,7 @@ public class Main extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addComponent(viewsecondBackupBtn))
                     .addComponent(backupBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(43, 43, 43))
+                .addGap(75, 75, 75))
         );
 
         getContentPane().add(rightPanel, java.awt.BorderLayout.WEST);
@@ -342,13 +331,13 @@ public class Main extends javax.swing.JFrame {
 
         jLabel5.setFont(new java.awt.Font("Segoe Print", 1, 36)); // NOI18N
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel5.setText("Versions");
+        jLabel5.setText("Packs");
 
         jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel6.setText("Click a version to replace the mods folder with that version's mods");
+        jLabel6.setText("Click a pack to replace the mods folder with that pack's mods");
 
         setCurrentBtn.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        setCurrentBtn.setText("Set Current Mods Folder Version");
+        setCurrentBtn.setText("Set Current Mods As A Pack");
         setCurrentBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 setCurrentBtnActionPerformed(evt);
@@ -356,7 +345,7 @@ public class Main extends javax.swing.JFrame {
         });
 
         renameCurrentBtn.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        renameCurrentBtn.setText("Rename Current Selected Mod");
+        renameCurrentBtn.setText("Rename Current Selected Pack");
         renameCurrentBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 renameCurrentBtnActionPerformed(evt);
@@ -394,25 +383,34 @@ public class Main extends javax.swing.JFrame {
             }
         });
 
+        addModsToVersionBtn.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        addModsToVersionBtn.setText("Add Mods To Selected Pack");
+        addModsToVersionBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addModsToVersionBtnActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout leftPanelLayout = new javax.swing.GroupLayout(leftPanel);
         leftPanel.setLayout(leftPanelLayout);
         leftPanelLayout.setHorizontalGroup(
             leftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(leftPanelLayout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, leftPanelLayout.createSequentialGroup()
                 .addGap(18, 18, 18)
-                .addGroup(leftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(leftPanelLayout.createSequentialGroup()
+                .addGroup(leftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(addModsToVersionBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, leftPanelLayout.createSequentialGroup()
                         .addComponent(setToCopy, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(28, 28, 28)
                         .addComponent(setToMove, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(18, 18, 18)
                         .addComponent(setToSymlink, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(renameCurrentBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(setCurrentBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(renameCurrentBtn, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(setCurrentBtn, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(23, 23, 23))
         );
         leftPanelLayout.setVerticalGroup(
@@ -420,10 +418,12 @@ public class Main extends javax.swing.JFrame {
             .addGroup(leftPanelLayout.createSequentialGroup()
                 .addGap(22, 22, 22)
                 .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel6)
-                .addGap(17, 17, 17)
+                .addGap(10, 10, 10)
                 .addComponent(setCurrentBtn)
+                .addGap(18, 18, 18)
+                .addComponent(addModsToVersionBtn)
                 .addGap(18, 18, 18)
                 .addComponent(renameCurrentBtn)
                 .addGap(18, 18, 18)
@@ -433,7 +433,7 @@ public class Main extends javax.swing.JFrame {
                     .addComponent(setToCopy)
                     .addComponent(setToMove)
                     .addComponent(setToSymlink))
-                .addGap(40, 40, 40)
+                .addGap(18, 18, 18)
                 .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
