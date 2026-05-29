@@ -15,7 +15,7 @@ import java.util.UUID;
  */
 public class M3Files {
 
-    public final File MODS_FOLDER;
+    private final File MODS_FOLDER;
     private final TextFile MODSFOLDER_TXT;
     private final TextFile CONFIG_TXT;
     private final File BACKUPS_FOLDER;
@@ -39,6 +39,10 @@ public class M3Files {
             BACKUPS_FOLDER.mkdirs();
     }
 
+    /**
+     * Reads the configuration settings from the config file.
+     * @return A HashMap where keys are configuration names and values are their settings.
+     */
     public HashMap<String, String> readConfig() {
         HashMap<String, String> config = new HashMap<>();
         ArrayList<String> lines = Files.readLines(CONFIG_TXT);
@@ -50,6 +54,10 @@ public class M3Files {
         return config;
     }
 
+    /**
+     * Writes the provided configuration map to the configuration file.
+     * @param config The HashMap representing the configuration to write.
+     */
     void writeConfig(HashMap<String, String> config) {
         Files.writeLines(CONFIG_TXT, (pw) -> {
             for (String key : config.keySet()) {
@@ -78,12 +86,20 @@ public class M3Files {
         writeConfig(config);
     }
 
+    /**
+     * Retrieves the movement method to use from the configuration.
+     * @return The MovementMethod.Type, or null if not set.
+     */
     public MovementMethod.Type getMethodToUse() {
         HashMap<String, String> config = readConfig();
         if (!config.containsKey(METHOD_KEY)) return null;
         return MovementMethod.Type.getByName(config.get(METHOD_KEY));
     }
 
+    /**
+     * Sets the movement method to use in the configuration.
+     * @param method The MovementMethod.Type to set.
+     */
     public void setMethodToUse(MovementMethod.Type method) {
         HashMap<String, String> config = readConfig();
         config.put(METHOD_KEY, method.getName());
@@ -209,5 +225,9 @@ public class M3Files {
      */
     public void addModFolder(ModFolder modFolder) {
         writeModFolder(modFolder);
+    }
+
+    public File getModsFolder() {
+        return MODS_FOLDER;
     }
 }

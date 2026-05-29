@@ -62,13 +62,20 @@ public class Main extends javax.swing.JFrame {
     public Main() {
         initComponents();
         if (folders.isEmpty()) {
+            modsFolderBtn.setText("Set Mods Folder");
+            disableAllButtons(true);
+            m3FolderBtn.setText("[Set mods folder first!]");
             return;
         }
         initFoldersAndMethods();
+
+        leftPanel.remove(setCurrentBtn);
+        leftPanel.revalidate();
+        leftPanel.repaint();
     }
 
     public void setMethodRadios() {
-        setMethodRadios(Folders.m3Files.getMethodToUse(), false);
+        setMethodRadios(Folders.m3Files.getMethodToUse() == null ? MovementMethod.Type.COPY : Folders.m3Files.getMethodToUse(), false);
         movementMethods.get(selectedMethod).setSelected(true);
     }
 
@@ -83,8 +90,9 @@ public class Main extends javax.swing.JFrame {
         }
     }
 
-    public void disableAllButtons() {
-        modsFolderBtn.setEnabled(false);
+    public void disableAllButtons(boolean skipModsFolder) {
+        if (!skipModsFolder)
+            modsFolderBtn.setEnabled(false);
         m3FolderBtn.setEnabled(false);
         addModsToVersionBtn.setEnabled(false);
         addNewVersionBtn.setEnabled(false);
@@ -98,8 +106,9 @@ public class Main extends javax.swing.JFrame {
         setToSymlink.setEnabled(false);
     }
 
-    public void enableAllButtons() {
-        modsFolderBtn.setEnabled(true);
+    public void enableAllButtons(boolean skipModsFolder) {
+        if (!skipModsFolder)
+            modsFolderBtn.setEnabled(true);
         m3FolderBtn.setEnabled(true);
         addModsToVersionBtn.setEnabled(true);
         addNewVersionBtn.setEnabled(true);
@@ -127,13 +136,13 @@ public class Main extends javax.swing.JFrame {
                 selectedFolder.getBtn().setSelected(true);
                 return;
             }
-            disableAllButtons();
+            disableAllButtons(false);
             Folders.m3Files.setSelectedVersion(folder);
             ModFolder old = selectedFolder;
             selectedFolder = folder;
             System.out.println("Set the folder to " + folder.getName());
             selectedMethod.getMethod().apply(folders, folder, new MovementConfig(old));
-            enableAllButtons();
+            enableAllButtons(false);
             JOptionPane.showMessageDialog(this,
                     "Loaded the following mods: \n\n" +
                             (selectedMethod == MovementMethod.Type.MOVE ?
@@ -161,7 +170,7 @@ public class Main extends javax.swing.JFrame {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         buttonGroup2 = new javax.swing.ButtonGroup();
-        jPanel1 = new javax.swing.JPanel();
+        rightPanel = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         modsFolderLabel = new javax.swing.JLabel();
         modsFolderBtn = new javax.swing.JButton();
@@ -175,7 +184,7 @@ public class Main extends javax.swing.JFrame {
         viewsecondBackupBtn = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
-        jPanel2 = new javax.swing.JPanel();
+        leftPanel = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         setCurrentBtn = new javax.swing.JButton();
@@ -188,10 +197,11 @@ public class Main extends javax.swing.JFrame {
         setToSymlink = new javax.swing.JRadioButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Minecraft Mod Mover");
 
-        jPanel1.setMaximumSize(new java.awt.Dimension(800, 1200));
-        jPanel1.setMinimumSize(new java.awt.Dimension(400, 600));
-        jPanel1.setPreferredSize(new java.awt.Dimension(400, 600));
+        rightPanel.setMaximumSize(new java.awt.Dimension(800, 1200));
+        rightPanel.setMinimumSize(new java.awt.Dimension(400, 600));
+        rightPanel.setPreferredSize(new java.awt.Dimension(400, 600));
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel1.setText("Minecraft Mods Folder:");
@@ -265,23 +275,23 @@ public class Main extends javax.swing.JFrame {
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel4.setText("Manage");
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        javax.swing.GroupLayout rightPanelLayout = new javax.swing.GroupLayout(rightPanel);
+        rightPanel.setLayout(rightPanelLayout);
+        rightPanelLayout.setHorizontalGroup(
+            rightPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(rightPanelLayout.createSequentialGroup()
                 .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(rightPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(m3FolderBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(modsFolderBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(addModsToVersionBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(addNewVersionBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
+                    .addGroup(rightPanelLayout.createSequentialGroup()
                         .addComponent(backupBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(rightPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(viewsecondBackupBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(viewBackupBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -289,9 +299,9 @@ public class Main extends javax.swing.JFrame {
                     .addComponent(modsFolderLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(23, Short.MAX_VALUE))
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        rightPanelLayout.setVerticalGroup(
+            rightPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(rightPanelLayout.createSequentialGroup()
                 .addGap(21, 21, 21)
                 .addComponent(jLabel1)
                 .addGap(18, 18, 18)
@@ -307,12 +317,12 @@ public class Main extends javax.swing.JFrame {
                 .addGap(76, 76, 76)
                 .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
-                .addComponent(addModsToVersionBtn)
-                .addGap(18, 18, 18)
                 .addComponent(addNewVersionBtn)
                 .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(addModsToVersionBtn)
+                .addGap(18, 18, 18)
+                .addGroup(rightPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(rightPanelLayout.createSequentialGroup()
                         .addComponent(viewBackupBtn)
                         .addGap(18, 18, 18)
                         .addComponent(viewsecondBackupBtn))
@@ -320,15 +330,15 @@ public class Main extends javax.swing.JFrame {
                 .addGap(43, 43, 43))
         );
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.WEST);
+        getContentPane().add(rightPanel, java.awt.BorderLayout.WEST);
 
         jSeparator1.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED), javax.swing.BorderFactory.createEtchedBorder()));
         jSeparator1.setMinimumSize(new java.awt.Dimension(20, 0));
         getContentPane().add(jSeparator1, java.awt.BorderLayout.CENTER);
 
-        jPanel2.setMaximumSize(new java.awt.Dimension(800, 1200));
-        jPanel2.setMinimumSize(new java.awt.Dimension(400, 600));
-        jPanel2.setPreferredSize(new java.awt.Dimension(400, 600));
+        leftPanel.setMaximumSize(new java.awt.Dimension(800, 1200));
+        leftPanel.setMinimumSize(new java.awt.Dimension(400, 600));
+        leftPanel.setPreferredSize(new java.awt.Dimension(400, 600));
 
         jLabel5.setFont(new java.awt.Font("Segoe Print", 1, 36)); // NOI18N
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -384,14 +394,14 @@ public class Main extends javax.swing.JFrame {
             }
         });
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+        javax.swing.GroupLayout leftPanelLayout = new javax.swing.GroupLayout(leftPanel);
+        leftPanel.setLayout(leftPanelLayout);
+        leftPanelLayout.setHorizontalGroup(
+            leftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(leftPanelLayout.createSequentialGroup()
                 .addGap(18, 18, 18)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGroup(leftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(leftPanelLayout.createSequentialGroup()
                         .addComponent(setToCopy, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(28, 28, 28)
                         .addComponent(setToMove, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -405,9 +415,9 @@ public class Main extends javax.swing.JFrame {
                     .addComponent(setCurrentBtn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(23, 23, 23))
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+        leftPanelLayout.setVerticalGroup(
+            leftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(leftPanelLayout.createSequentialGroup()
                 .addGap(22, 22, 22)
                 .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
@@ -419,7 +429,7 @@ public class Main extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(38, 38, 38)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(leftPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(setToCopy)
                     .addComponent(setToMove)
                     .addComponent(setToSymlink))
@@ -428,7 +438,7 @@ public class Main extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        getContentPane().add(jPanel2, java.awt.BorderLayout.EAST);
+        getContentPane().add(leftPanel, java.awt.BorderLayout.EAST);
 
         pack();
         setLocationRelativeTo(null);
@@ -436,12 +446,20 @@ public class Main extends javax.swing.JFrame {
 
     private void modsFolderBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_modsFolderBtnActionPerformed
         File chosenFolder = Files.folderChooser(this);
-        if (chosenFolder == null)
+        if (chosenFolder == null) {
             JOptionPane.showMessageDialog(this, "Please select your mods folder.", "Error", JOptionPane.ERROR_MESSAGE);
-        else {
-            folders = new Folders(chosenFolder, true);
-            initFoldersAndMethods();
+            return;
         }
+
+        folders = new Folders(chosenFolder, true);
+        initFoldersAndMethods();
+
+        enableAllButtons(true);
+        modsFolderBtn.setText("Change Mods Folder");
+        m3FolderBtn.setText(
+                "Change M3 Folder"
+        );
+
     }//GEN-LAST:event_modsFolderBtnActionPerformed
 
     private void m3FolderBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_m3FolderBtnActionPerformed
@@ -463,14 +481,14 @@ public class Main extends javax.swing.JFrame {
         buttonGroup1.clearSelection();
 
         folders.setM3Folder(chosenFolder, false);
-        if (Folders.m3Files.MODS_FOLDER.listFiles().length == 0)
+        if (Folders.m3Files.getModsFolder().listFiles().length == 0)
             folders.addEmptyPreset();
 
         initFoldersAndMethods();
 
         if (!old.equals(chosenFolder) &&
                 new BooleanDialogue(this,
-                        "A previous M3 location was created (" + old.getAbsolutePath() + "). Would you like to delete it? (A backup will be saved in the secondary backup location)")
+                        "<html>A previous M3 location was created (" + old.getAbsolutePath() + "). Would you like to delete it? (A backup will be saved in the secondary backup location)</html>")
                         .response()
         ) {
             Files.backupFolder(Folders.homeFiles.getBackupFolder(), old, "m3-folder-backup");
@@ -502,6 +520,10 @@ public class Main extends javax.swing.JFrame {
         modFolderRadioButtons.put(modFolder.getId(), modFolder.getBtn());
         buttonGrpPanel.revalidate();
         buttonGrpPanel.repaint();
+
+        leftPanel.remove(setCurrentBtn);
+        leftPanel.revalidate();
+        leftPanel.repaint();
     }//GEN-LAST:event_addNewVersionBtnActionPerformed
 
     private void addModsToVersionBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addModsToVersionBtnActionPerformed
@@ -606,10 +628,31 @@ public class Main extends javax.swing.JFrame {
     }//GEN-LAST:event_viewsecondBackupBtnActionPerformed
 
     private void setCurrentBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setCurrentBtnActionPerformed
-        // TODO add your handling code here:
+        // Set whatever is in the mods folder as a new version
+        File[] mods = folders.getModsFolder().listFiles();
+        if (mods == null || mods.length == 0) return;
+        if (!new BooleanDialogue(this, "<html>"
+                + "This quickly creates a version of the mods you currently have loaded. A backup will be made."
+                +"</html>").response())
+            return;
+        Files.backupMods(Folders.m3Files.getBackupsFolder());
+
+        addNewVersionBtnActionPerformed(evt); // make the new version.
+
+        selectedFolder.addMods(mods);
     }//GEN-LAST:event_setCurrentBtnActionPerformed
 
     private void renameCurrentBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_renameCurrentBtnActionPerformed
+        if (selectedFolder.getId().equals(ModFolder.EMPTY_PRESET)) {
+            JOptionPane.showMessageDialog(
+                    this,
+                    "You cannot rename the Empty Preset. Please select or create a new version folder.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
+
         String newName = JOptionPane.showInputDialog(this,
 
 "Enter new name for " + selectedFolder.getName(),
@@ -728,14 +771,14 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JPanel leftPanel;
     private javax.swing.JButton m3FolderBtn;
     private javax.swing.JButton modsFolderBtn;
     private javax.swing.JLabel modsFolderLabel;
     private javax.swing.JButton renameCurrentBtn;
+    private javax.swing.JPanel rightPanel;
     private javax.swing.JButton setCurrentBtn;
     private javax.swing.JRadioButton setToCopy;
     private javax.swing.JRadioButton setToMove;

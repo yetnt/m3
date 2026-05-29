@@ -40,7 +40,7 @@ public class ModFolder {
     }
 
     public static ModFolder create(String name, UUID id) {
-        File folder = new File(Folders.m3Files.MODS_FOLDER, String.valueOf(id));
+        File folder = new File(Folders.m3Files.getModsFolder(), String.valueOf(id));
         folder.mkdirs();
         return new ModFolder(folder, name, id, 0);
     }
