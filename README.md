@@ -1,6 +1,6 @@
 # Minecraft Mods Mover (M3)
 
-**V1.0.0**
+**V1.1.0**
 
 A simple Java Swing utility app which assists with moving mod packs (folders) so that
 you don't have to yourself.

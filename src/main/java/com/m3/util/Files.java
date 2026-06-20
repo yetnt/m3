@@ -125,7 +125,7 @@ public class Files {
      */
     public static void backupFolder(File targetStore, File target, String name) {
 
-        File[] amt = targetStore.listFiles();
+        File[] amt = target.listFiles();
         if (amt == null || amt.length == 0) {
             return;
         }
@@ -136,8 +136,8 @@ public class Files {
         File zipFile = new File(targetStore, zipFileName);
 
         try (ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(zipFile))) {
-            if (target != null && target.exists() && target.isDirectory()) {
-                for (File file : target.listFiles()) {
+            if (target.exists() && target.isDirectory()) {
+                for (File file : amt) {
                     Files.addFileToZip(file, file.getName(), zos);
                 }
             }
